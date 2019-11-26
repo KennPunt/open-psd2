@@ -50,7 +50,7 @@ export default class ING {
 
     async requestCustomerAccessToken(authorizationCode: string, accessToken: string) {
         if (this.SANDBOX) {
-            authorizationCode = "694d6ca9-1310-4d83-8dbb-e819c1ee6b80";
+            authorizationCode = "76175013-94d0-411d-927c-0af6bb828c7c"; //https://developer.ing.com/static/AIS.pdf Belgium
         }
 
         const bodyData = {
@@ -64,17 +64,17 @@ export default class ING {
     }
 
     async requestAccounts(customerAccessToken: string) {
-        const result = await this.requestAPI("get", "/v1/accounts", customerAccessToken);
+        const result = await this.requestAPI("get", "/v3/accounts", customerAccessToken);
         return result.accounts;
     }
 
     async requestBalances(customerAccessToken: string, accountId: string) {
-        const result = await this.requestAPI("get", "/v1/accounts/" + accountId + "/balances", customerAccessToken);
+        const result = await this.requestAPI("get", "/v3/accounts/" + accountId + "/balances", customerAccessToken);
         return result.accounts;
     }
 
     async requestTransactions(customerAccessToken: string, accountId: string) {
-        const result = await this.requestAPI("get", "/v1/accounts/" + accountId + "/transactions", customerAccessToken);
+        const result = await this.requestAPI("get", "/v2/accounts/" + accountId + "/transactions", customerAccessToken);
         return result.accounts;
     }
 
@@ -147,22 +147,6 @@ export default class ING {
             httpsAgent: this.agent
         };
 
-        // SANDBOX API is a bit different :?
-        if (this.SANDBOX) {
-            options = {
-                method: 'post',
-                headers: {
-                    'Signature': `keyId="${this.clientId}",algorithm="rsa-sha256",headers="(request-target) date digest x-ing-reqid",signature="${signature}"`,
-                    'X-ING-ReqID': reqId,
-                    'Date': dateString,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Digest': `SHA-256=${digest}`
-                } as any,
-                data: body,
-                url: this.apiBasePath + "/oauth2/token",
-                httpsAgent: this.agent
-            };
-        }
 
         // Return result
         const result = await axios(options);
